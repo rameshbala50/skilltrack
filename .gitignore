@@ -1,0 +1,21 @@
+# Credentials & config
+api/config.php
+deploy.env
+
+# Utility/debug scripts (not app code)
+*.ps1
+*.json
+!data/seed.js
+aieng-skills-sample.txt
+debug.php
+debug-sync.php
+ai-test.php
+
+# Temp/diagnostic PHP scripts
+api/check-user.php
+api/cleanup-user.php
+api/rename-user.php
+
+# OS files
+.DS_Store
+Thumbs.db

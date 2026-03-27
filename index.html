@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillTrack — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-container">
+
+    <!-- Brand Panel -->
+    <div class="auth-brand">
+      <div class="auth-brand-inner">
+        <div class="auth-logo">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="10" fill="white" fill-opacity="0.15"/>
+            <path d="M10 28L16 18L22 22L28 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="28" cy="12" r="3" fill="#06b6d4"/>
+            <circle cx="22" cy="22" r="2.5" fill="white" fill-opacity="0.7"/>
+            <circle cx="16" cy="18" r="2.5" fill="white" fill-opacity="0.7"/>
+          </svg>
+          <span class="auth-logo-text">SkillTrack</span>
+        </div>
+        <h1 class="auth-tagline">Bridge the gap between<br>where you are and<br>where you want to be.</h1>
+        <ul class="auth-features">
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            AI-powered skill gap analysis
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Personalised learning paths
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Smart timetable scheduling
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Job application tracker
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="auth-form-panel">
+      <div class="auth-form-inner">
+
+        <!-- Tab switcher -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="showTab('login')">Sign In</button>
+          <button class="auth-tab" id="tab-register" onclick="showTab('register')">Create Account</button>
+          <button class="auth-tab" id="tab-reset" onclick="showTab('reset')" style="display:none">Reset Password</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="form-login" class="auth-form" onsubmit="handleLogin(event)">
+          <h2 class="auth-form-title">Welcome back</h2>
+          <p class="auth-form-subtitle">Sign in to continue your learning journey</p>
+
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email address</label>
+            <input class="form-input" type="email" id="login-email" placeholder="you@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">
+              Password
+            </label>
+            <div class="input-with-icon">
+              <input class="form-input" type="password" id="login-password" placeholder="Enter your password" required autocomplete="current-password">
+              <button type="button" class="input-icon-btn" onclick="togglePassword('login-password', this)" title="Show password">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="login-error" class="form-error" style="display:none"></div>
+
+          <button type="submit" class="btn btn-primary btn-full" id="btn-login">
+            <span>Sign In</span>
+          </button>
+
+          <p class="auth-switch">
+            Don't have an account?
+            <a href="#" onclick="showTab('register'); return false;">Create one free</a>
+          </p>
+          <p class="auth-switch" style="margin-top:0">
+            <a href="#" onclick="showTab('reset'); return false;">Forgot password?</a>
+          </p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="form-register" class="auth-form" style="display:none" onsubmit="handleRegister(event)">
+          <h2 class="auth-form-title">Get started free</h2>
+          <p class="auth-form-subtitle">Create your account and start tracking skills today</p>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Full name</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="Your name" required autocomplete="name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email address</label>
+            <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Password</label>
+            <div class="input-with-icon">
+              <input class="form-input" type="password" id="reg-password" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password">
+              <button type="button" class="input-icon-btn" onclick="togglePassword('reg-password', this)" title="Show password">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="password-strength" id="pwd-strength" style="display:none">
+              <div class="pwd-bar"><div class="pwd-fill" id="pwd-fill"></div></div>
+              <span class="pwd-label" id="pwd-label"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-confirm">Confirm password</label>
+            <input class="form-input" type="password" id="reg-confirm" placeholder="Repeat your password" required minlength="8" autocomplete="new-password">
+          </div>
+
+          <div id="register-error" class="form-error" style="display:none"></div>
+
+          <button type="submit" class="btn btn-primary btn-full" id="btn-register">
+            <span>Create Account</span>
+          </button>
+
+          <p class="auth-switch">
+            Already have an account?
+            <a href="#" onclick="showTab('login'); return false;">Sign in</a>
+          </p>
+        </form>
+
+        <!-- Reset Password Form -->
+        <form id="form-reset" class="auth-form" style="display:none" onsubmit="handleResetPassword(event)">
+          <h2 class="auth-form-title">Reset Password</h2>
+          <p class="auth-form-subtitle">Enter your email and set a new password</p>
+
+          <div class="form-group">
+            <label class="form-label" for="reset-email">Email address</label>
+            <input class="form-input" type="email" id="reset-email" placeholder="you@example.com" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reset-password">New password</label>
+            <div class="input-with-icon">
+              <input class="form-input" type="password" id="reset-password" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password">
+              <button type="button" class="input-icon-btn" onclick="togglePassword('reset-password', this)" title="Show password">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reset-confirm">Confirm new password</label>
+            <input class="form-input" type="password" id="reset-confirm" placeholder="Repeat your new password" required minlength="8" autocomplete="new-password">
+          </div>
+
+          <div id="reset-error" class="form-error" style="display:none"></div>
+          <div id="reset-success" class="form-error" style="display:none;color:#16a34a"></div>
+
+          <button type="submit" class="btn btn-primary btn-full" id="btn-reset">
+            <span>Reset Password</span>
+          </button>
+
+          <p class="auth-switch">
+            Remember your password?
+            <a href="#" onclick="showTab('login'); return false;">Sign in</a>
+          </p>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Tab switching ──────────────────────────────────────────────
+    function showTab(tab) {
+      document.getElementById('form-login').style.display    = tab === 'login'    ? '' : 'none';
+      document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+      document.getElementById('form-reset').style.display    = tab === 'reset'    ? '' : 'none';
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      // Show/hide reset tab dynamically
+      document.getElementById('tab-reset').style.display = tab === 'reset' ? '' : 'none';
+      if (tab === 'reset') document.getElementById('tab-reset').classList.add('active');
+      else document.getElementById('tab-reset').classList.remove('active');
+    }
+
+    // ── Password visibility toggle ─────────────────────────────────
+    function togglePassword(id, btn) {
+      const input = document.getElementById(id);
+      const show  = input.type === 'password';
+      input.type  = show ? 'text' : 'password';
+      btn.innerHTML = show
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    }
+
+    // ── Password strength ──────────────────────────────────────────
+    document.getElementById('reg-password').addEventListener('input', function() {
+      const val = this.value;
+      const el  = document.getElementById('pwd-strength');
+      const fill = document.getElementById('pwd-fill');
+      const lbl  = document.getElementById('pwd-label');
+      if (!val) { el.style.display = 'none'; return; }
+      el.style.display = '';
+      let score = 0;
+      if (val.length >= 8)  score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const levels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      const colors = ['', '#ef4444', '#f59e0b', '#0d9488', '#06b6d4'];
+      const pct    = ['', '25%', '50%', '75%', '100%'];
+      fill.style.width      = pct[score]  || '25%';
+      fill.style.background = colors[score] || '#ef4444';
+      lbl.textContent       = levels[score] || 'Weak';
+      lbl.style.color       = colors[score] || '#ef4444';
+    });
+
+    // ── Show error helper ──────────────────────────────────────────
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+    function clearError(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    // ── Set button loading state ───────────────────────────────────
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      btn.disabled = loading;
+      btn.querySelector('span').textContent = loading ? 'Please wait…' : btn.id === 'btn-login' ? 'Sign In' : 'Create Account';
+    }
+
+    // ── Local (demo) storage helpers ──────────────────────────────
+    const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const ADMIN_EMAILS_LOCAL = ['w3help@yahoo.com'];
+
+    // Seed default test user on first visit
+    (function seedDefaultUser() {
+      if (!IS_LOCAL) return;
+      const users = JSON.parse(localStorage.getItem('st-users') || '[]');
+      const existing = users.find(u => u.email === 'w3help@yahoo.com');
+      if (!existing) {
+        users.push({ uid: 'w3help@yahoo.com', name: 'Test User', email: 'w3help@yahoo.com', role: 'admin', password: 'naresh01', createdAt: new Date().toISOString() });
+        localStorage.setItem('st-users', JSON.stringify(users));
+      } else if (existing.role !== 'admin') {
+        existing.role = 'admin';
+        localStorage.setItem('st-users', JSON.stringify(users));
+      }
+    })();
+
+    function localGetUsers() {
+      return JSON.parse(localStorage.getItem('st-users') || '[]');
+    }
+    function localSaveUsers(users) {
+      localStorage.setItem('st-users', JSON.stringify(users));
+    }
+    function localSetSession(user) {
+      localStorage.setItem('st-session', JSON.stringify({ uid: user.uid, name: user.name, email: user.email, role: user.role || 'webuser' }));
+    }
+
+    // ── Login handler ──────────────────────────────────────────────
+    async function handleLogin(e) {
+      e.preventDefault();
+      clearError('login-error');
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      setLoading('btn-login', true);
+
+      if (IS_LOCAL) {
+        // Demo mode: check localStorage
+        const users = localGetUsers();
+        const user  = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+        if (user) {
+          const role = user.role || (ADMIN_EMAILS_LOCAL.includes(email.toLowerCase()) ? 'admin' : 'webuser');
+          const sessionUser = { ...user, role };
+          localSetSession(sessionUser);
+          const payload = btoa(unescape(encodeURIComponent(JSON.stringify({ uid: sessionUser.uid, name: sessionUser.name, email: sessionUser.email, role: sessionUser.role }))));
+          window.location.href = 'dashboard.html#s=' + payload;
+        } else {
+          showError('login-error', 'Invalid email or password.');
+          setLoading('btn-login', false);
+        }
+        return;
+      }
+
+      try {
+        const res  = await fetch('api/auth.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'login', email, password })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          window.location.href = 'dashboard.php';
+        } else {
+          showError('login-error', data.error || 'Invalid email or password.');
+        }
+      } catch {
+        showError('login-error', 'Connection error. Please try again.');
+      } finally {
+        setLoading('btn-login', false);
+      }
+    }
+
+    // ── Reset Password handler ────────────────────────────────────
+    async function handleResetPassword(e) {
+      e.preventDefault();
+      clearError('reset-error');
+      document.getElementById('reset-success').style.display = 'none';
+      const email       = document.getElementById('reset-email').value.trim();
+      const newPassword = document.getElementById('reset-password').value;
+      const confirm     = document.getElementById('reset-confirm').value;
+      if (newPassword !== confirm) {
+        showError('reset-error', 'Passwords do not match.');
+        return;
+      }
+      const btn = document.getElementById('btn-reset');
+      btn.disabled = true;
+      btn.querySelector('span').textContent = 'Please wait…';
+
+      if (IS_LOCAL) {
+        const users = localGetUsers();
+        const user  = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        if (!user) {
+          showError('reset-error', 'No account found with that email.');
+          btn.disabled = false;
+          btn.querySelector('span').textContent = 'Reset Password';
+          return;
+        }
+        user.password = newPassword;
+        localSaveUsers(users);
+        const el = document.getElementById('reset-success');
+        el.textContent = 'Password reset successfully! You can now sign in.';
+        el.style.display = 'block';
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'Reset Password';
+        setTimeout(() => showTab('login'), 2000);
+        return;
+      }
+
+      try {
+        const res  = await fetch('api/auth.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'reset_password', email, newPassword })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          const el = document.getElementById('reset-success');
+          el.textContent = 'Password reset successfully! You can now sign in.';
+          el.style.display = 'block';
+          setTimeout(() => showTab('login'), 2000);
+        } else {
+          showError('reset-error', data.error || 'Reset failed.');
+        }
+      } catch {
+        showError('reset-error', 'Connection error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'Reset Password';
+      }
+    }
+
+    // ── Register handler ───────────────────────────────────────────
+    async function handleRegister(e) {
+      e.preventDefault();
+      clearError('register-error');
+      const name     = document.getElementById('reg-name').value.trim();
+      const email    = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm  = document.getElementById('reg-confirm').value;
+      if (password !== confirm) {
+        showError('register-error', 'Passwords do not match.');
+        return;
+      }
+      setLoading('btn-register', true);
+
+      if (IS_LOCAL) {
+        // Demo mode: save to localStorage
+        const users = localGetUsers();
+        if (users.find(u => u.email === email)) {
+          showError('register-error', 'An account with this email already exists.');
+          setLoading('btn-register', false);
+          return;
+        }
+        const role = ADMIN_EMAILS_LOCAL.includes(email.toLowerCase()) ? 'admin' : 'webuser';
+        const user = { uid: email.toLowerCase(), name, email, role, password, createdAt: new Date().toISOString() };
+        users.push(user);
+        localSaveUsers(users);
+        localSetSession(user);
+        const payload = btoa(unescape(encodeURIComponent(JSON.stringify({ uid: user.uid, name: user.name, email: user.email, role: user.role }))));
+        window.location.href = 'dashboard.html#s=' + payload;
+        return;
+      }
+
+      try {
+        const res  = await fetch('api/auth.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'register', name, email, password })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          window.location.href = 'dashboard.php';
+        } else {
+          showError('register-error', data.error || 'Registration failed. Please try again.');
+        }
+      } catch {
+        showError('register-error', 'Connection error. Please try again.');
+      } finally {
+        setLoading('btn-register', false);
+      }
+    }
+  </script>
+
+</body>
+</html>
