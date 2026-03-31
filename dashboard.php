@@ -96,6 +96,14 @@ session_write_close();
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
         Job Tracker
       </a>
+      <a class="nav-item" data-panel="dicejobs" onclick="switchPanel('dicejobs', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9"/></svg>
+        Dice Jobs
+      </a>
+      <a class="nav-item" data-panel="linkedinjobs" onclick="switchPanel('linkedinjobs', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn Jobs
+      </a>
 
       <!-- Admin nav — hidden until role verified -->
       <div class="nav-section-label admin-only" style="display:none">Admin</div>
@@ -669,6 +677,114 @@ session_write_close();
 
         <!-- Results (below) -->
         <div id="jp-results"></div>
+      </section>
+
+      <!-- ── Dice Jobs Import ───────────────────────────────── -->
+      <section class="panel" id="panel-dicejobs">
+        <div class="panel-header">
+          <h1 class="panel-title">Dice Jobs Import</h1>
+          <p class="panel-subtitle">Import jobs from Dice.com search results — extracts metadata, description, and syncs to your tracker</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Import Settings</h3>
+          </div>
+          <div class="card-body" style="padding-top:8px">
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">Dice Search URL</label>
+              <input class="form-input" type="url" id="dice-url" placeholder="Paste Dice search URL (e.g. https://www.dice.com/jobs?q=AI+Engineer&...)" style="width:100%">
+            </div>
+            <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+              <div class="form-group" style="flex:0 0 120px">
+                <label class="form-label">Pages</label>
+                <input class="form-input" type="number" id="dice-pages" value="5" min="1" max="50" style="width:100%">
+              </div>
+              <div class="form-group" style="flex:1;min-width:200px">
+                <label class="form-label">Linked Goal <span style="font-weight:400;color:var(--muted)">(optional — auto-detected from role)</span></label>
+                <select class="form-input" id="dice-goal" style="width:100%">
+                  <option value="">— Auto-detect from role —</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+              <button class="btn btn-primary" id="dice-start-btn" onclick="diceStartImport()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3"/></svg>
+                Start Import
+              </button>
+              <button class="btn btn-ghost" id="dice-stop-btn" onclick="diceStop()" style="display:none;color:#dc2626">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="6" width="12" height="12"/></svg>
+                Stop
+              </button>
+              <span id="dice-progress-text" style="font-size:12px;color:var(--muted);margin-left:8px"></span>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="dice-progress-wrap">
+              <div class="dice-progress-bar" id="dice-progress-bar"></div>
+            </div>
+            <div id="dice-stats" style="font-size:12px;font-weight:600;color:var(--primary);margin-top:4px"></div>
+          </div>
+        </div>
+
+        <!-- Log output -->
+        <div class="card" style="margin-top:16px">
+          <div class="card-header">
+            <h3 class="card-title">Import Log</h3>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div id="dice-log" class="dice-log"></div>
+          </div>
+        </div>
+
+        <div id="dice-results"></div>
+      </section>
+
+      <!-- ── LinkedIn Jobs Import ─────────────────────────────── -->
+      <section class="panel" id="panel-linkedinjobs">
+        <div class="panel-header">
+          <h1 class="panel-title">LinkedIn Jobs</h1>
+          <p class="panel-subtitle">Add a LinkedIn job URL — extracts role, company, salary, description, and saves to your tracker</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Add LinkedIn Job</h3>
+          </div>
+          <div class="card-body" style="padding-top:8px">
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">LinkedIn Job URL</label>
+              <input class="form-input" type="url" id="li-url" placeholder="Paste LinkedIn job URL (e.g. https://www.linkedin.com/jobs/view/123456789)" style="width:100%">
+            </div>
+            <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+              <div class="form-group" style="flex:1;min-width:200px">
+                <label class="form-label">Linked Goal <span style="font-weight:400;color:var(--muted)">(optional — auto-detected from role)</span></label>
+                <select class="form-input" id="li-goal" style="width:100%">
+                  <option value="">— Auto-detect from role —</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn btn-primary" id="li-fetch-btn" onclick="liImportJob()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                Fetch &amp; Add Job
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Log output -->
+        <div class="card" style="margin-top:16px">
+          <div class="card-header">
+            <h3 class="card-title">Import Log</h3>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div id="li-log" class="dice-log" style="min-height:60px"></div>
+          </div>
+        </div>
+
+        <!-- Result display -->
+        <div id="li-result"></div>
       </section>
 
       <!-- ── Admin: Overview ──────────────────────────────────── -->
@@ -1334,6 +1450,8 @@ session_write_close();
   <script src="js/timetable.js?v=<?php echo $v; ?>"></script>
   <script src="js/jobs.js?v=<?php echo $v; ?>"></script>
   <script src="js/jobposting.js?v=<?php echo $v; ?>"></script>
+  <script src="js/dicejobs.js?v=<?php echo $v; ?>"></script>
+  <script src="js/linkedinjobs.js?v=<?php echo $v; ?>"></script>
   <script src="js/admin.js?v=<?php echo $v; ?>"></script>
 
   <!-- ── Admin: Template Metadata Modal ─────────────────────── -->

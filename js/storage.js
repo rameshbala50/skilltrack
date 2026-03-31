@@ -22,11 +22,23 @@ function _uid() {
 }
 function _key(module) { return 'st-' + _uid() + '-' + module; }
 
+// ── Server-only modules (too large for localStorage) ──────────────
+const _SERVER_ONLY = { jobs: true };
+const _memCache = {};  // in-memory cache for server-only modules
+
 // ── Read / Write ───────────────────────────────────────────────────
 function stRead(module) {
+  if (_SERVER_ONLY[module] && !IS_LOCAL) {
+    return _memCache[_uid() + '-' + module] || [];
+  }
   return JSON.parse(localStorage.getItem(_key(module)) || '[]');
 }
 function stWrite(module, data) {
+  if (_SERVER_ONLY[module] && !IS_LOCAL) {
+    _memCache[_uid() + '-' + module] = data;
+    _serverSync(module, data);
+    return;
+  }
   localStorage.setItem(_key(module), JSON.stringify(data));
   if (!IS_LOCAL) _serverSync(module, data);
 }
@@ -135,7 +147,8 @@ function _hideSyncWarning() {
   if (bar) bar.style.display = 'none';
 }
 
-// ── Server init: load all data from PHP APIs into localStorage ─────
+// ── Server init: load data from PHP APIs ──────────────────────────
+// Server-only modules (jobs) go into memory cache; others into localStorage.
 async function stInit() {
   if (IS_LOCAL) return;
   const modules = ['goals', 'skills', 'learning', 'timetable', 'jobs'];
@@ -151,7 +164,14 @@ async function stInit() {
       });
       const d = await res.json();
       if (d.ok) {
-        localStorage.setItem(_key(mod), JSON.stringify(d.data ?? []));
+        if (_SERVER_ONLY[mod]) {
+          // Store in memory only — too large for localStorage
+          _memCache[_uid() + '-' + mod] = d.data ?? [];
+          // Clean up old localStorage data for this module
+          try { localStorage.removeItem(_key(mod)); } catch(e) {}
+        } else {
+          localStorage.setItem(_key(mod), JSON.stringify(d.data ?? []));
+        }
       } else if (d.error === 'Not authenticated') {
         authFailed = true;
       }
