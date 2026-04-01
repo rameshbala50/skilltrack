@@ -2208,6 +2208,58 @@ select.input { cursor: pointer; }
   40%           { transform: scale(1);   opacity: 1;   }
 }
 
+/* ── Job Summary ─────────────────────────────────────────────────── */
+.js-stats-row {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.js-stat-card {
+  flex: 1; min-width: 120px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; text-align: center; cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.js-stat-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(13,148,136,.1); }
+.js-stat-val { font-size: 28px; font-weight: 700; color: var(--primary); line-height: 1; }
+.js-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.js-section {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 16px;
+}
+.js-section-title {
+  font-weight: 600; font-size: .85rem; color: var(--text); margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.js-table { width: 100%; border-collapse: collapse; }
+.js-table td { font-size: .82rem; border-bottom: 1px solid var(--surface2); }
+.js-row-click { cursor: pointer; transition: background .1s; }
+.js-row-click:hover { background: rgba(13,148,136,.06); }
+
+/* ── Job Tracker 2: Card Grid ────────────────────────────────────── */
+.jt2-card {
+  padding: 12px 16px; border-radius: 8px; margin-bottom: 2px;
+  border: 1px solid var(--border); cursor: pointer; transition: box-shadow .15s;
+}
+.jt2-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+.jt2-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.jt2-role { font-weight: 600; font-size: .88rem; color: var(--text); }
+.jt2-company { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+.jt2-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.jt2-score { font-size: 1.1rem; font-weight: 700; font-family: var(--mono); }
+.jt2-status { font-size: .68rem; font-weight: 600; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+.jt2-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.jt2-tag { font-size: .68rem; padding: 2px 8px; border-radius: 12px; background: var(--surface2); color: var(--muted); }
+.jt2-salary { color: #16a34a; font-weight: 600; background: #f0fdf4; }
+.jt2-goal { color: var(--primary); background: rgba(13,148,136,.08); }
+.jt2-id { font-family: var(--mono); font-size: .65rem; color: var(--primary); background: rgba(13,148,136,.06); }
+.jt2-action-btn {
+  width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--surface); cursor: pointer; display: inline-flex; align-items: center;
+  justify-content: center; color: var(--muted); transition: all .15s;
+}
+.jt2-edit-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(13,148,136,.06); }
+.jt2-del-btn:hover { color: #dc2626; border-color: #dc2626; background: #fef2f2; }
+.jt2-card-sel { border-color: var(--primary) !important; box-shadow: 0 2px 8px rgba(13,148,136,.12); }
+.jt2-detail-pane { margin-bottom: 4px; border: 1px solid var(--primary); border-radius: 0 0 8px 8px; margin-top: -2px; overflow: hidden; }
+
 /* ── Dice Jobs Import ────────────────────────────────────────────── */
 .dice-progress-wrap {
   height: 6px;

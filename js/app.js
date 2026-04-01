@@ -17,7 +17,8 @@ const PANEL_TITLES = {
   reqskills:'Required Skills',
   gap:'Gap Analysis', learning:'Learning Path',
   progress:'Progress', timetable:'Timetable', jobs:'Job Tracker',
-  jobposting:'Job Posting Analyser', dicejobs:'Dice Jobs Import', linkedinjobs:'LinkedIn Jobs',
+  jobposting:'Job Posting Analyser', jobsummary:'Job Summary',
+  dicejobs:'Dice Jobs Import', linkedinjobs:'LinkedIn Jobs',
   'admin-overview':'Admin — Overview', 'admin-templates':'Goal Templates', 'admin-users':'Users', 'admin-tests':'Test Cases', 'admin-params':'Parameters', 'admin-userguide':'User Guide', 'admin-funcspec':'Functional Spec'
 };
 const PANEL_ACTIONS = { goals:'New Goal', skills:'Add Skill' };
@@ -55,6 +56,7 @@ function switchPanel(name, clickedEl) {
   if (name === 'timetable')  timetableRender && timetableRender();
   if (name === 'jobs')             jobsRender          && jobsRender();
   if (name === 'jobposting')       jpRender            && jpRender();
+  if (name === 'jobsummary')       jobSummaryRender     && jobSummaryRender();
   if (name === 'dicejobs')         diceJobsRender      && diceJobsRender();
   if (name === 'linkedinjobs')     linkedinJobsRender  && linkedinJobsRender();
   if (name === 'admin-overview')  adminOverviewRender  && adminOverviewRender();

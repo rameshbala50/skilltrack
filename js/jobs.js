@@ -234,7 +234,7 @@ function jobsSearchDebounced() {
     jobsRender();
   }, 300);
 }
-let _jobStatusFilter   = 'all';
+let _jobStatusFilter   = 'except-not-interested';
 let _jobCompanyFilter  = 'all';
 let _jobSourceFilter   = 'all';
 let _jobLocationFilter = 'all';
@@ -337,7 +337,9 @@ function _jobPopulateFilters(jobs) {
     return m ? m[1] : '';
   }).filter(Boolean))].sort();
 
-  populate(stsSel, statuses, _jobStatusFilter, 'All Statuses');
+  // Add "Except Not Interested" as first option after "All"
+  const stsOpts = [{ value: 'except-not-interested', label: 'Except Not Interested' }, ...statuses.map(s => ({ value: s, label: s }))];
+  populate(stsSel, stsOpts, _jobStatusFilter, 'All Statuses');
   populate(catSel, catOpts, _jobRoleCatFilter, 'All Roles');
   populate(compSel, companies, _jobCompanyFilter, 'All Companies');
   populate(stateSel, states, _jobLocationFilter, 'All States');
@@ -387,7 +389,8 @@ function jobsRender() {
   let filtered = [...jobs];
   const q = _jobSearch.toLowerCase();
   if (q) filtered = filtered.filter(j => _jobMatchesSearch(j, q));
-  if (_jobStatusFilter !== 'all')   filtered = filtered.filter(j => _jobMigrateStatus(j.status) === _jobStatusFilter);
+  if (_jobStatusFilter === 'except-not-interested') filtered = filtered.filter(j => _jobMigrateStatus(j.status) !== 'Not Interested');
+  else if (_jobStatusFilter !== 'all') filtered = filtered.filter(j => _jobMigrateStatus(j.status) === _jobStatusFilter);
   if (_jobRoleCatFilter !== 'all')  filtered = filtered.filter(j => _jobRoleCat(j) === _jobRoleCatFilter);
   if (_jobCompanyFilter !== 'all')  filtered = filtered.filter(j => j.company === _jobCompanyFilter);
   if (_jobLocationFilter !== 'all') filtered = filtered.filter(j => j.state === _jobLocationFilter);
@@ -499,78 +502,63 @@ function _sourceFilterHtml(jobs) {
 function setJobStatusFilter(val) { _jobStatusFilter = val; jobsRender(); }
 function setJobSourceFilter(val) { _jobSourceFilter = val; jobsRender(); }
 
-// ── Table View ──────────────────────────────────────────────────────
-const _JT_COL_COUNT = 10; // for colspan on detail row
+// ── Card View (v2 layout) ─────────────────────────────────────────
+const _JT_COL_COUNT = 10; // kept for compatibility
+
+function _scoreColorV2(s) {
+  if (s >= 75) return '#16a34a';
+  if (s >= 50) return '#ca8a04';
+  return '#dc2626';
+}
 
 function _jobTableHtml(jobs) {
-  const rows = jobs.map(j => {
+  const cards = jobs.map((j, i) => {
     const ai    = j.aiAnalysis;
     const score = ai ? ai.matchScore : null;
-    const scoreC = score != null ? _scoreColor(score) : null;
+    const sc    = score != null ? _scoreColorV2(score) : null;
     const sel   = _jobSelectedId === j.id;
     const displayStatus = _jobMigrateStatus(j.status);
     const m     = JOB_STATUS_META[displayStatus] || JOB_STATUS_META[j.status] || {};
+    const loc   = [j.city, j.state].filter(Boolean).join(', ');
+    const bg    = i % 2 === 0 ? 'var(--surface)' : 'var(--bg)';
 
-    const scoreBadge = score != null
-      ? `<span class="jt-score" style="background:${scoreC}18;color:${scoreC};border:1px solid ${scoreC}35">${score}%</span>`
-      : '<span class="jt-muted">—</span>';
+    let html = `<div class="jt2-card ${sel ? 'jt2-card-sel' : ''}" style="border-left:4px solid ${m.color || '#94a3b8'};background:${bg}" onclick="jobsSelectRow('${j.id}')">
+      <div class="jt2-card-head">
+        <div class="jt2-card-info">
+          <div class="jt2-role">${esc(j.role)}</div>
+          <div class="jt2-company">${esc(j.company)}${loc ? ' · ' + esc(loc) : ''}</div>
+        </div>
+        <div class="jt2-right">
+          ${score != null ? `<span class="jt2-score" style="color:${sc}">${score}%</span>` : ''}
+          <span class="jt2-status" style="background:${m.bg};color:${m.color};border:1px solid ${m.border}">${m.emoji} ${displayStatus}</span>
+          <button class="jt2-action-btn jt2-edit-btn" title="Edit" onclick="event.stopPropagation();openJobModal('${j.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="jt2-action-btn jt2-del-btn" title="Delete" onclick="event.stopPropagation();jobsDelete('${j.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="jt2-meta">
+        ${j.source ? `<span class="jt2-tag">${esc(j.source)}</span>` : ''}
+        ${j.employmentType ? `<span class="jt2-tag">${esc(j.employmentType)}</span>` : ''}
+        ${j.workMode ? `<span class="jt2-tag">${esc(j.workMode)}</span>` : ''}
+        ${j.salary ? `<span class="jt2-tag jt2-salary">${esc(j.salary)}</span>` : ''}
+        ${j.linkedGoal ? `<span class="jt2-tag jt2-goal">${esc(j.linkedGoal)}</span>` : ''}
+        ${j.jobId ? `<span class="jt2-tag jt2-id">${esc(j.jobId)}</span>` : ''}
+      </div>
+    </div>`;
 
-    const statusBadge = `<span class="jt-status-badge" style="background:${m.color||'#64748b'}18;color:${m.color||'#64748b'};border:1px solid ${m.color||'#64748b'}35">${m.emoji||''} ${displayStatus}</span>`;
-
-    const loc = [j.city, j.state].filter(Boolean).join(', ') || '—';
-
-    let rowHtml = `<tr class="jt-row ${sel ? 'jt-row-sel' : ''}" onclick="jobsSelectRow('${j.id}')">
-      <td class="jt-td-jobid"><span class="jt-jobid">${esc(j.jobId || '—')}</span></td>
-      <td class="jt-td-role">
-        <div class="jt-role">${esc(j.role)}</div>
-        <div class="jt-company">${esc(j.company)}</div>
-      </td>
-      <td class="jt-td-status">${statusBadge}</td>
-      <td class="jt-td-score">${scoreBadge}</td>
-      <td class="jt-td-location">${esc(loc)}</td>
-      <td class="jt-td-source">${esc(j.source || '—')}</td>
-      <td class="jt-td-salary">${j.salary ? esc(j.salary) : '—'}</td>
-      <td class="jt-td-date">${j.addedAt ? _fmtDateDMY(j.addedAt) : '—'}</td>
-      <td class="jt-td-date">${j.appliedDate ? _fmtDateDMY(j.appliedDate) : '—'}</td>
-      <td class="jt-td-actions" onclick="event.stopPropagation()">
-        <button class="icon-btn" title="Edit" onclick="openJobModal('${j.id}')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="icon-btn icon-btn-danger" title="Delete" onclick="jobsDelete('${j.id}')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-        </button>
-      </td>
-    </tr>`;
-
-    // Insert detail row right below the selected row
+    // Detail pane below selected card
     if (sel) {
       const detailJob = stRead('jobs').find(x => x.id === j.id) || j;
-      rowHtml += `<tr class="jt-detail-row"><td colspan="${_JT_COL_COUNT}"><div class="jd-pane jd-pane-open jd-pane-inline">${_jobDetailPaneHtml(detailJob)}</div></td></tr>`;
+      html += `<div class="jt2-detail-pane"><div class="jd-pane jd-pane-open jd-pane-inline">${_jobDetailPaneHtml(detailJob)}</div></div>`;
     }
 
-    return rowHtml;
+    return html;
   }).join('');
 
-  const sortIcon = (col) => {
-    if (_jobSortCol !== col) return '<span class="jt-sort-icon">⇅</span>';
-    return _jobSortAsc ? '<span class="jt-sort-icon jt-sort-active">▲</span>' : '<span class="jt-sort-icon jt-sort-active">▼</span>';
-  };
-
-  return `<div class="jt-table-wrap">
-    <table class="jt-table">
-      <thead>
-        <tr class="jt-head">
-          <th class="jt-th-sortable" onclick="jobsSortBy('jobId')">Job ID ${sortIcon('jobId')}</th>
-          <th class="jt-th-role jt-th-sortable" onclick="jobsSortBy('role')">Role / Company ${sortIcon('role')}</th>
-          <th class="jt-th-status jt-th-sortable" onclick="jobsSortBy('status')">Status ${sortIcon('status')}</th>
-          <th class="jt-th-score jt-th-sortable" onclick="jobsSortBy('score')">Match ${sortIcon('score')}</th>
-          <th class="jt-th-sortable" onclick="jobsSortBy('location')">Location ${sortIcon('location')}</th>
-          <th class="jt-th-source jt-th-sortable" onclick="jobsSortBy('source')">Source ${sortIcon('source')}</th>
-          <th class="jt-th-sortable" onclick="jobsSortBy('salary')">Salary ${sortIcon('salary')}</th>
-          <th class="jt-th-date jt-th-sortable" onclick="jobsSortBy('addedAt')">Added ${sortIcon('addedAt')}</th>
-          <th class="jt-th-date jt-th-sortable" onclick="jobsSortBy('appliedDate')">Applied ${sortIcon('appliedDate')}</th>
-          <th class="jt-th-actions"></th>
-        </tr>
+  return cards;
       </thead>
       <tbody>${rows}</tbody>
     </table>
@@ -586,10 +574,10 @@ function jobsSelectRow(id) {
     _jobSelectedId = id;
   }
   jobsRender();
-  // Scroll to the detail row if opened
+  // Scroll to the detail pane if opened
   if (_jobSelectedId) {
     setTimeout(() => {
-      const detailRow = document.querySelector('.jt-detail-row');
+      const detailRow = document.querySelector('.jt2-detail-pane') || document.querySelector('.jt-detail-row');
       if (detailRow) detailRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 50);
   }
@@ -784,7 +772,8 @@ function _getFilteredJobs() {
   let filtered = [...allJobs];
   const q = _jobSearch.toLowerCase();
   if (q) filtered = filtered.filter(j => _jobMatchesSearch(j, q));
-  if (_jobStatusFilter !== 'all')   filtered = filtered.filter(j => _jobMigrateStatus(j.status) === _jobStatusFilter);
+  if (_jobStatusFilter === 'except-not-interested') filtered = filtered.filter(j => _jobMigrateStatus(j.status) !== 'Not Interested');
+  else if (_jobStatusFilter !== 'all') filtered = filtered.filter(j => _jobMigrateStatus(j.status) === _jobStatusFilter);
   if (_jobRoleCatFilter !== 'all')  filtered = filtered.filter(j => _jobRoleCat(j) === _jobRoleCatFilter);
   if (_jobCompanyFilter !== 'all')  filtered = filtered.filter(j => j.company === _jobCompanyFilter);
   if (_jobLocationFilter !== 'all') filtered = filtered.filter(j => j.state === _jobLocationFilter);

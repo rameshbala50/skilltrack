@@ -81,6 +81,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="2"/><path d="M20 19c0-2.21-3.58-4-8-4"/></svg>
         Job Posting
       </a>
+      <a class="nav-item" data-panel="jobsummary" onclick="switchPanel('jobsummary', this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Job Summary
+      </a>
       <a class="nav-item" data-panel="jobs" onclick="switchPanel('jobs', this)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
         Job Tracker
@@ -558,6 +562,15 @@
             <p>Set your available study hours, then auto-schedule to generate a personalised timetable from your learning paths.</p>
           </div>
         </div>
+      </section>
+
+      <!-- ── Job Summary ────────────────────────────────────── -->
+      <section class="panel" id="panel-jobsummary">
+        <div class="panel-header">
+          <h1 class="panel-title">Job Summary</h1>
+          <p class="panel-subtitle">Overview of all tracked jobs — click any row to open Job Tracker with that filter</p>
+        </div>
+        <div id="job-summary-content"></div>
       </section>
 
       <!-- ── 8. Job Tracker ───────────────────────────────────── -->
@@ -1432,6 +1445,8 @@
   <script src="js/progress.js"></script>
   <script src="js/timetable.js"></script>
   <script src="js/jobs.js"></script>
+  <script src="js/jobsummary.js"></script>
+  <script src="js/jobalts.js"></script>
   <script src="js/jobposting.js"></script>
   <script src="js/dicejobs.js"></script>
   <script src="js/linkedinjobs.js"></script>
