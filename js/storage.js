@@ -29,7 +29,10 @@ const _memCache = {};  // in-memory cache for server-only modules
 // ── Read / Write ───────────────────────────────────────────────────
 function stRead(module) {
   if (_SERVER_ONLY[module] && !IS_LOCAL) {
-    return _memCache[_uid() + '-' + module] || [];
+    const key = _uid() + '-' + module;
+    const data = _memCache[key];
+    if (!data) console.warn('[SkillTrack] stRead cache miss:', key, 'keys in cache:', Object.keys(_memCache));
+    return data || [];
   }
   return JSON.parse(localStorage.getItem(_key(module)) || '[]');
 }
@@ -153,7 +156,10 @@ async function stInit() {
   if (IS_LOCAL) return;
   const modules = ['goals', 'skills', 'learning', 'timetable', 'jobs'];
   let authFailed = false;
-  await Promise.all(modules.map(async mod => {
+  // Load non-server-only modules in parallel
+  const smallMods = modules.filter(m => !_SERVER_ONLY[m]);
+  const bigMods   = modules.filter(m => _SERVER_ONLY[m]);
+  await Promise.all(smallMods.map(async mod => {
     try {
       const body = { action: 'list' };
       if (window._workAsUid) body.as_uid = window._workAsUid;
@@ -164,14 +170,7 @@ async function stInit() {
       });
       const d = await res.json();
       if (d.ok) {
-        if (_SERVER_ONLY[mod]) {
-          // Store in memory only — too large for localStorage
-          _memCache[_uid() + '-' + mod] = d.data ?? [];
-          // Clean up old localStorage data for this module
-          try { localStorage.removeItem(_key(mod)); } catch(e) {}
-        } else {
-          localStorage.setItem(_key(mod), JSON.stringify(d.data ?? []));
-        }
+        localStorage.setItem(_key(mod), JSON.stringify(d.data ?? []));
       } else if (d.error === 'Not authenticated') {
         authFailed = true;
       }
@@ -179,6 +178,36 @@ async function stInit() {
       console.warn('[SkillTrack] stInit fetch failed for', mod, e);
     }
   }));
+  // Load server-only modules (e.g. jobs) sequentially — large payloads
+  for (const mod of bigMods) {
+    try {
+      const body = { action: 'list' };
+      if (window._workAsUid) body.as_uid = window._workAsUid;
+      const res = await fetch('api/' + mod + '.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) { console.warn('[SkillTrack] stInit HTTP error for', mod, res.status); continue; }
+      const text = await res.text();
+      let d;
+      try { d = JSON.parse(text); } catch(pe) {
+        console.error('[SkillTrack] stInit JSON parse failed for', mod, 'size:', text.length, pe);
+        continue;
+      }
+      if (d.ok) {
+        const uid = _uid();
+        _memCache[uid + '-' + mod] = d.data ?? [];
+        console.log('[SkillTrack] Loaded', mod, ':', (d.data ?? []).length, 'items for uid:', uid);
+        try { localStorage.removeItem(_key(mod)); } catch(e) {}
+      } else if (d.error === 'Not authenticated') {
+        authFailed = true;
+      }
+    } catch(e) {
+      console.error('[SkillTrack] stInit fetch failed for', mod, e);
+      _showSyncWarning('Failed to load ' + mod + ' data. Try refreshing the page.');
+    }
+  }
   if (authFailed) {
     window.location.href = 'index.php';
   }

@@ -559,10 +559,6 @@ function _jobTableHtml(jobs) {
   }).join('');
 
   return cards;
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>`;
 }
 
 // ── Row Selection & Inline Detail ─────────────────────────────────
@@ -1288,8 +1284,7 @@ function setJobView(view, btn) {
 
 // ── Init ────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  _jobBackfillIds();
   const search = document.getElementById('jobs-search');
   if (search) search.addEventListener('input', jobsSearchDebounced);
-  jobsRender();
+  // _jobBackfillIds() and jobsRender() called by app.js after stInit() completes
 });

@@ -541,6 +541,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof learningRender === 'function')   learningRender();
   if (typeof timetableRender === 'function')  timetableRender();
   if (typeof progressRender === 'function')   progressRender();
+  if (typeof _jobBackfillIds === 'function')   _jobBackfillIds();
   if (typeof jobsRender === 'function')       jobsRender();
 
   _initApiKeyBtn();
